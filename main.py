@@ -5,7 +5,7 @@ total_pages = len(reader.pages)
 
 content = []
 true_line = ""
-for i in range(20):
+for i in range(total_pages):
     page = reader.pages[i].extract_text()
     page = page.replace("Admitted Candidates List All Round- MBBS/BDS/B.Sc. Nursing (UG 2024)","") #remove unnecessary text
     page_content = page.split("\n")        #make every line as a list item
@@ -67,10 +67,12 @@ for line_no in range(len(content)):
     row = row[::-1]
     
     inst = row
+    if len(inst)>700:
+        print(len(inst))
 
         
 
-    print(roll,quota,rank,caste,sub_cat,choice,inst_code,deg,cat, ph, round)
+    #print(roll,quota,rank,caste,sub_cat,choice,inst_code,deg,cat, ph, round)
 
 
 
