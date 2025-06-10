@@ -1,4 +1,5 @@
-from PyPDF2 import PdfReader
+from PyPDF2 import PdfReader #
+from PyPDF2 import PdfReader #vardhman
 import csv
 
 reader = PdfReader("neet_stats.pdf")
@@ -35,9 +36,10 @@ csv_writer.writerow(["roll","quota","AIR","caste","PwD","choice","institute_code
 
 #extract candidate info from content
 for line_no in range(len(content)):
-    row = content[line_no].split()
-    roll = str(row.pop(0))
-
+    row = content[line_no]
+    roll = row[0:10]
+    row=row.replace(roll,"",1)
+    row = row.split()
     row = " ".join(row)
     quota = ""
     i=0
@@ -98,6 +100,7 @@ for line_no in range(len(content)):
     row = row[::-1]
 
     row = row.replace(cat,"")
+    row = row.replace("_","")
     inst = row
 
     data = [roll,quota,rank,caste,sub_cat,choice,inst_code,inst,deg,cat, ph, round]
