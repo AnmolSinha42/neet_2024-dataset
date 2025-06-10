@@ -6,6 +6,7 @@ total_pages = len(reader.pages)
 
 content = []
 true_line = ""
+
 for i in range(total_pages):
     page = reader.pages[i].extract_text()
     page = page.replace("Admitted Candidates List All Round- MBBS/BDS/B.Sc. Nursing (UG 2024)","") #remove unnecessary text
@@ -17,7 +18,8 @@ for i in range(total_pages):
      #content is a list where each item is a true line
    
     for line in page_content:
-        if line.split()[0].isnumeric() and len(line.split()[0])==10: #length of a roll no is 10 and each true line starts with roll number
+        if line[0:10].isnumeric(): #length of a roll no is 10 and each true line starts with roll number
+            #if true_line[0:10] == "2002240029" or true_line[0:10] == "2807030391": -- gives exception
             content.append(true_line) #will make 1st line empty
             true_line = line
         else:
@@ -32,11 +34,9 @@ csv_writer = csv.writer(file)
 csv_writer.writerow(["roll","quota","AIR","caste","PwD","choice","institute_code","institute","degree","alloted_category","alloted_ph","round"])
 
 #extract candidate info from content
-for line_no in range(len(content)//100):
+for line_no in range(len(content)):
     row = content[line_no].split()
-    cat, ph, round = row[-3:] #all are strings, cat is alloted category
-    del row[-3:]
-    roll = row.pop(0)
+    roll = str(row.pop(0))
 
     row = " ".join(row)
     quota = ""
@@ -45,9 +45,20 @@ for line_no in range(len(content)//100):
         quota += row[i]
         i += 1
     row=row.replace(quota,"",1)
+    row = row.strip()
+
+    rank = ""
+    i=0
+    if row[i]==" ":
+        i+=1
+    while row[i].isnumeric() or row[i]==".":
+        rank += row[i]
+        if row[i+1]== " ":
+            i+=1
+        i += 1
+    row=row.replace(rank,"",1)
 
     row = row.split()
-    rank = row.pop(0)
     caste = row.pop(0)
     sub_cat = row.pop(0) #pwd etc
     choice = row.pop(0) #option number in priority list
@@ -60,20 +71,34 @@ for line_no in range(len(content)//100):
         i += 1
     row=row.replace(inst_code,"",1)
 
+    round = row[-1]
+    row = row[0:-1]
+    row = row.strip() 
+    if "Disability" in row:
+        row = row.replace("Person with Disability","")
+        ph = "PwD"
+    else:
+        ph = row[-2:] #ph is "NO"
+        row = row[0:-2]
+    row = row.strip()
+
+    row = row.split()
+    row = " ".join(row)
+
     #only 3 subjects - MBBS, BDS, B.Sc. Nursing
-    if row[-4:]=="MBBS":
-        deg = "MBBS"
-    elif row[-3:]=="BDS":
+    if "B.Sc. Nursing" in row:
+        deg = "B.Sc. Nursing"
+    elif "BDS" in row:
         deg = "BDS"
     else:
-        deg = "B.Sc. Nursing"
+        deg = "MBBS"
     row = row[::-1]
-    row=row.replace(deg[::-1],"",1)
+    row=row.replace(deg[::-1],"_",1)
+    cat = row.partition("_")[0][::-1]
     row = row[::-1]
 
+    row = row.replace(cat,"")
     inst = row
-
-    
 
     data = [roll,quota,rank,caste,sub_cat,choice,inst_code,inst,deg,cat, ph, round]
     csv_writer.writerow(data)
@@ -82,7 +107,4 @@ for line_no in range(len(content)//100):
     
     #print(roll,quota,rank,caste,sub_cat,choice,inst_code,deg,cat, ph, round)
 file.close()
-
-
-
 
