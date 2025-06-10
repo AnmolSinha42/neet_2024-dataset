@@ -1,4 +1,5 @@
 from PyPDF2 import PdfReader
+import csv
 
 reader = PdfReader("neet_stats.pdf")
 total_pages = len(reader.pages)
@@ -26,8 +27,12 @@ for i in range(total_pages):
 content.pop(0) #1st line is empty
 content.append(true_line)
 
+file = open("neet24.csv","w")
+csv_writer = csv.writer(file)
+csv_writer.writerow(["roll","quota","AIR","caste","PwD","choice","institute_code","institute","degree","alloted_category","alloted_ph","round"])
+
 #extract candidate info from content
-for line_no in range(len(content)):
+for line_no in range(len(content)//100):
     row = content[line_no].split()
     cat, ph, round = row[-3:] #all are strings, cat is alloted category
     del row[-3:]
@@ -65,14 +70,19 @@ for line_no in range(len(content)):
     row = row[::-1]
     row=row.replace(deg[::-1],"",1)
     row = row[::-1]
-    
+
     inst = row
-    if len(inst)>700:
-        print(len(inst))
 
+    
+
+    data = [roll,quota,rank,caste,sub_cat,choice,inst_code,inst,deg,cat, ph, round]
+    csv_writer.writerow(data)
+    #sql.execute("INSERT INTO neet (roll,quota,AIR,caste,PwD,choice,institute_code,institute,degree,alloted_category,alloted_ph,round) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",(roll,quota,rank,caste,sub_cat,choice,inst_code,inst,deg,cat, ph, round))
         
-
+    
     #print(roll,quota,rank,caste,sub_cat,choice,inst_code,deg,cat, ph, round)
+file.close()
+
 
 
 
