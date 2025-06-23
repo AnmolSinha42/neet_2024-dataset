@@ -1,5 +1,5 @@
-from PyPDF2 import PdfReader #
-from PyPDF2 import PdfReader #vardhman
+from PyPDF2 import PdfReader 
+from PyPDF2 import PdfReader 
 import csv
 
 reader = PdfReader("neet_stats.pdf")
